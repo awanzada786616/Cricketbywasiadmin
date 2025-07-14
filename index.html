@@ -52,10 +52,12 @@
   <div id="msg"></div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore-compat.js"></script>
 
+<script>
+  // Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyCutZ4-S27z8DzRQQnREMDLKdP-b3zV95s",
     authDomain: "cricketpredition-5a66d.firebaseapp.com",
@@ -65,10 +67,12 @@
     appId: "1:980647942349:web:8e2100fdc783723623b184"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-  async function submitPrediction() {
+  // Submit Prediction
+  function submitPrediction() {
     const match = document.getElementById('match').value;
     const teamA = document.getElementById('teamA').value;
     const teamAPercent = parseInt(document.getElementById('teamAPercent').value);
@@ -81,21 +85,20 @@
       return;
     }
 
-    try {
-      await addDoc(collection(db, "my-predictions"), {
-        match,
-        teamA,
-        teamAPercent,
-        teamB,
-        teamBPercent,
-        topPlayer,
-        timestamp: serverTimestamp()
-      });
+    db.collection("my-predictions").add({
+      match,
+      teamA,
+      teamAPercent,
+      teamB,
+      teamBPercent,
+      topPlayer,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
       document.getElementById('msg').innerText = "✅ Prediction submitted!";
-    } catch (err) {
-      console.error("🔥 Error writing to Firestore:", err);
+    }).catch((error) => {
+      console.error("🔥 Error:", error);
       document.getElementById('msg').innerText = "❌ Failed to submit!";
-    }
+    });
   }
 </script>
 </body>
