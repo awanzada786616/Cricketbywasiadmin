@@ -1,55 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel – Add Prediction</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Cricket Prediction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #f3f4f6;
-      padding: 20px;
+      background: #f5f5f5;
+      padding: 30px;
     }
 
     .container {
       max-width: 500px;
-      margin: auto;
+      margin: 0 auto;
       background: white;
       padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
 
     h2 {
       text-align: center;
-      color: #0d47a1;
       margin-bottom: 20px;
+      color: #1e88e5;
     }
 
     label {
       font-weight: bold;
-      margin-top: 15px;
       display: block;
+      margin-top: 15px;
     }
 
     input {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       border-radius: 6px;
       margin-top: 5px;
     }
 
     button {
-      margin-top: 25px;
       width: 100%;
-      padding: 12px;
-      background-color: #0d47a1;
+      background-color: #1e88e5;
       color: white;
+      padding: 12px;
+      margin-top: 20px;
+      font-size: 16px;
       border: none;
-      font-weight: bold;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
     }
 
@@ -57,40 +57,43 @@
       background-color: #1565c0;
     }
 
-    #status {
+    .message {
       text-align: center;
-      font-weight: bold;
       margin-top: 15px;
+      font-weight: bold;
+      color: green;
     }
   </style>
 </head>
 <body>
+
   <div class="container">
-    <h2>🧑‍💼 Admin – Add Prediction</h2>
+    <h2>🛠️ Admin Panel - Prediction</h2>
 
-    <label>Match Name</label>
-    <input type="text" id="match" placeholder="e.g. India vs Pakistan" />
+    <label for="match">Match</label>
+    <input type="text" id="match" placeholder="e.g. India vs England">
 
-    <label>Team A Name</label>
-    <input type="text" id="teamA" placeholder="e.g. India" />
+    <label for="teamA">Team A</label>
+    <input type="text" id="teamA" placeholder="e.g. India">
 
-    <label>Team A %</label>
-    <input type="number" id="teamAPercent" placeholder="e.g. 60" />
+    <label for="teamAPercent">Team A %</label>
+    <input type="number" id="teamAPercent" placeholder="e.g. 60">
 
-    <label>Team B Name</label>
-    <input type="text" id="teamB" placeholder="e.g. Pakistan" />
+    <label for="teamB">Team B</label>
+    <input type="text" id="teamB" placeholder="e.g. England">
 
-    <label>Team B %</label>
-    <input type="number" id="teamBPercent" placeholder="e.g. 40" />
+    <label for="teamBPercent">Team B %</label>
+    <input type="number" id="teamBPercent" placeholder="e.g. 40">
 
-    <label>Top Player</label>
-    <input type="text" id="topPlayer" placeholder="e.g. Babar Azam" />
+    <label for="topPlayer">Top Player</label>
+    <input type="text" id="topPlayer" placeholder="e.g. Babar Azam">
 
-    <button onclick="submitPrediction()">📤 Submit Prediction</button>
-    <div id="status"></div>
+    <button onclick="submitPrediction()">Submit Prediction</button>
+
+    <div class="message" id="msg"></div>
   </div>
 
-  <!-- Firebase -->
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
@@ -108,17 +111,15 @@
     const db = getFirestore(app);
 
     async function submitPrediction() {
-      const match = document.getElementById("match").value.trim();
-      const teamA = document.getElementById("teamA").value.trim();
-      const teamAPercent = parseInt(document.getElementById("teamAPercent").value);
-      const teamB = document.getElementById("teamB").value.trim();
-      const teamBPercent = parseInt(document.getElementById("teamBPercent").value);
-      const topPlayer = document.getElementById("topPlayer").value.trim();
-      const status = document.getElementById("status");
+      const match = document.getElementById('match').value;
+      const teamA = document.getElementById('teamA').value;
+      const teamAPercent = parseInt(document.getElementById('teamAPercent').value);
+      const teamB = document.getElementById('teamB').value;
+      const teamBPercent = parseInt(document.getElementById('teamBPercent').value);
+      const topPlayer = document.getElementById('topPlayer').value;
 
-      if (!match || !teamA || !teamB || isNaN(teamAPercent) || isNaN(teamBPercent)) {
-        status.textContent = "⚠️ Please fill all fields properly.";
-        status.style.color = "red";
+      if (!match || !teamA || !teamB || isNaN(teamAPercent) || isNaN(teamBPercent) || !topPlayer) {
+        alert("Please fill in all fields correctly.");
         return;
       }
 
@@ -132,12 +133,10 @@
           topPlayer,
           timestamp: serverTimestamp()
         });
-        status.textContent = "✅ Prediction submitted successfully!";
-        status.style.color = "green";
+        document.getElementById('msg').textContent = "✅ Prediction submitted!";
       } catch (error) {
         console.error("Error submitting prediction:", error);
-        status.textContent = "❌ Failed to submit. Check console.";
-        status.style.color = "red";
+        document.getElementById('msg').textContent = "❌ Error submitting prediction.";
       }
     }
   </script>
