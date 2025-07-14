@@ -1,138 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+  <title>Admin - Cricket Prediction</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - Cricket Prediction</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
+      background: #f7f7f7;
       padding: 20px;
     }
-
-    .box {
-      background: white;
+    .container {
       max-width: 500px;
-      margin: auto;
+      background: white;
       padding: 20px;
+      margin: auto;
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-
-    h2 {
-      text-align: center;
-      color: #1a73e8;
-    }
-
-    label {
-      margin-top: 10px;
-      display: block;
-      font-weight: bold;
-    }
-
-    input {
+    input, button {
       width: 100%;
       padding: 10px;
-      margin-top: 5px;
+      margin-top: 10px;
+      border-radius: 5px;
       border: 1px solid #ccc;
-      border-radius: 6px;
     }
-
     button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
       background: #1a73e8;
       color: white;
-      border: none;
       font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
+      border: none;
     }
-
-    #message {
-      text-align: center;
+    #msg {
       margin-top: 15px;
-      color: green;
+      text-align: center;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <div class="box">
-    <h2>🛠️ Admin Prediction Panel</h2>
+<div class="container">
+  <h2>🛠 Admin Prediction Panel</h2>
+  <input type="text" id="match" placeholder="Match (e.g. India vs Pakistan)">
+  <input type="text" id="teamA" placeholder="Team A">
+  <input type="number" id="teamAPercent" placeholder="Team A %">
+  <input type="text" id="teamB" placeholder="Team B">
+  <input type="number" id="teamBPercent" placeholder="Team B %">
+  <input type="text" id="topPlayer" placeholder="Top Player">
+  <button onclick="submitPrediction()">Submit Prediction</button>
+  <div id="msg"></div>
+</div>
 
-    <label>Match</label>
-    <input type="text" id="match" placeholder="e.g. India vs Pakistan">
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-    <label>Team A</label>
-    <input type="text" id="teamA" placeholder="e.g. India">
+  const firebaseConfig = {
+    apiKey: "AIzaSyCutZ4-S27z8DzRQQnREMDLKdP-b3zV95s",
+    authDomain: "cricketpredition-5a66d.firebaseapp.com",
+    projectId: "cricketpredition-5a66d",
+    storageBucket: "cricketpredition-5a66d.appspot.com",
+    messagingSenderId: "980647942349",
+    appId: "1:980647942349:web:8e2100fdc783723623b184"
+  };
 
-    <label>Team A %</label>
-    <input type="number" id="teamAPercent" placeholder="e.g. 60">
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    <label>Team B</label>
-    <input type="text" id="teamB" placeholder="e.g. Pakistan">
+  async function submitPrediction() {
+    const match = document.getElementById('match').value;
+    const teamA = document.getElementById('teamA').value;
+    const teamAPercent = parseInt(document.getElementById('teamAPercent').value);
+    const teamB = document.getElementById('teamB').value;
+    const teamBPercent = parseInt(document.getElementById('teamBPercent').value);
+    const topPlayer = document.getElementById('topPlayer').value;
 
-    <label>Team B %</label>
-    <input type="number" id="teamBPercent" placeholder="e.g. 40">
-
-    <label>Top Player</label>
-    <input type="text" id="topPlayer" placeholder="e.g. Virat Kohli">
-
-    <button onclick="submitPrediction()">Submit</button>
-    <div id="message"></div>
-  </div>
-
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCutZ4-S27z8DzRQQnREMDLKdP-b3zV95s",
-      authDomain: "cricketpredition-5a66d.firebaseapp.com",
-      projectId: "cricketpredition-5a66d",
-      storageBucket: "cricketpredition-5a66d.appspot.com",
-      messagingSenderId: "980647942349",
-      appId: "1:980647942349:web:8e2100fdc783723623b184"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    async function submitPrediction() {
-      const match = document.getElementById('match').value;
-      const teamA = document.getElementById('teamA').value;
-      const teamAPercent = Number(document.getElementById('teamAPercent').value);
-      const teamB = document.getElementById('teamB').value;
-      const teamBPercent = Number(document.getElementById('teamBPercent').value);
-      const topPlayer = document.getElementById('topPlayer').value;
-
-      if (!match || !teamA || !teamB || !teamAPercent || !teamBPercent || !topPlayer) {
-        alert("Please fill in all fields");
-        return;
-      }
-
-      try {
-        await addDoc(collection(db, "my-predictions"), {
-          match,
-          teamA,
-          teamAPercent,
-          teamB,
-          teamBPercent,
-          topPlayer,
-          timestamp: serverTimestamp()
-        });
-
-        document.getElementById('message').innerText = "✅ Prediction saved successfully!";
-      } catch (error) {
-        console.error("Error:", error);
-        document.getElementById('message').innerText = "❌ Error saving prediction.";
-      }
+    if (!match || !teamA || !teamB || isNaN(teamAPercent) || isNaN(teamBPercent) || !topPlayer) {
+      alert("Please fill all fields");
+      return;
     }
-  </script>
+
+    try {
+      await addDoc(collection(db, "my-predictions"), {
+        match,
+        teamA,
+        teamAPercent,
+        teamB,
+        teamBPercent,
+        topPlayer,
+        timestamp: serverTimestamp()
+      });
+      document.getElementById('msg').innerText = "✅ Prediction submitted!";
+    } catch (err) {
+      console.error("🔥 Error writing to Firestore:", err);
+      document.getElementById('msg').innerText = "❌ Failed to submit!";
+    }
+  }
+</script>
 </body>
 </html>
