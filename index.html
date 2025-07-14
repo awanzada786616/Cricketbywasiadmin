@@ -52,12 +52,12 @@
   <div id="msg"></div>
 </div>
 
-<!-- Firebase SDKs -->
+<!-- ✅ Firebase compat SDKs -->
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore-compat.js"></script>
 
 <script>
-  // Firebase Config
+  // ✅ Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyCutZ4-S27z8DzRQQnREMDLKdP-b3zV95s",
     authDomain: "cricketpredition-5a66d.firebaseapp.com",
@@ -67,11 +67,11 @@
     appId: "1:980647942349:web:8e2100fdc783723623b184"
   };
 
-  // Initialize Firebase
+  // ✅ Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // Submit Prediction
+  // ✅ Submit function
   function submitPrediction() {
     const match = document.getElementById('match').value;
     const teamA = document.getElementById('teamA').value;
@@ -93,10 +93,12 @@
       teamBPercent,
       topPlayer,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
+    })
+    .then(() => {
       document.getElementById('msg').innerText = "✅ Prediction submitted!";
-    }).catch((error) => {
-      console.error("🔥 Error:", error);
+    })
+    .catch((error) => {
+      console.error("❌ Error:", error);
       document.getElementById('msg').innerText = "❌ Failed to submit!";
     });
   }
